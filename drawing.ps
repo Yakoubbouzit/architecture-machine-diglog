@@ -1,0 +1,143 @@
+%!PS-Adobe-2.0
+% PostScript output from PLOT library
+save
+%  PS-in-TeX macros
+
+% Determine whether or not we are being called from TeX.  Currently, this
+% relies on GPOSX being defined or not.
+%
+%  Is-TeX <boolean>
+%
+/GPOSX where /Is-TeX exch def Is-TeX {pop} if % Define Is-TeX and eat "dict"
+
+% Try to define the current TeX-MBB.  If not Is-TeX then use the user-supplied
+% TeX-MBB or the whole page if TeX-MBB can not be found.
+%
+%  TeX-MBB <[mbb in TeX space]>
+%
+Is-TeX
+   {/TeX-MBB [GPOSX GPOSY currentpoint] def}
+   {/TeX-MBB where {pop} {/TeX-MBB [20 20 576 756] def} ifelse}
+ifelse
+
+%
+%  Define a couple of macros that do stuff if you are in TeX or not.
+%
+%  <procedure> In-Tex
+%  <procedure> Not-In-Tex
+%
+/In-TeX {Is-TeX exch if} def
+/Not-In-TeX {Is-TeX not exch if} def
+
+%
+%  Set up square scaling given an MBB
+%
+%  <[user-mbb]> TeX-do-square-scale
+%
+/TeX-do-square-scale {
+   % get User mbb
+      aload pop
+      /U-top   exch def
+      /U-right exch def
+      /U-bot   exch def
+      /U-left  exch def
+   % sort MBB
+      U-top U-bot lt    {U-top U-bot /U-top exch def /U-bot exch def} if
+      U-right U-left lt {U-right U-left /U-right exch def /U-left exch def} if
+   /U-height U-top U-bot sub def
+   /U-width  U-right U-left sub def
+   % get TeX MBB
+      TeX-MBB aload pop
+      /T-top   exch def
+      /T-right exch def
+      /T-bot   exch def
+      /T-left  exch def
+   % sort MBB
+      T-top T-bot lt    {T-top T-bot /T-top exch def /T-bot exch def} if
+      T-right T-left lt {T-right T-left /T-right exch def /T-left exch def} if
+   /T-height T-top T-bot sub def
+   /T-width  T-right T-left sub def
+   % Compute scaling in X and Y
+      /S-x T-width  U-width  div def
+      /S-y T-height U-height div def
+   % Make scales equal and center Tex-Mbb
+   % extra height=(T-height - S-x * U-height)
+   % Then divide by 2 and add to bottom (similar for extrawidth) }
+      S-x S-y gt
+      { /S-x S-y def 
+        T-width S-x U-width mul sub 2 div T-left add /T-left exch def }
+      { /S-y S-x def
+        T-height S-x U-height mul sub 2 div T-bot add /T-bot exch def }
+   ifelse
+   % Compute translation
+   T-left T-bot translate
+   S-x S-y scale
+   % Compute translation
+   U-left neg U-bot neg translate
+} def
+
+%
+%  Set up non-square scaling given an MBB
+%
+%  <[user-mbb]> TeX-do-scale
+%
+/TeX-do-scale {
+   aload pop % get User mbb
+   /U-top   exch def
+   /U-right exch def
+   /U-bot   exch def
+   /U-left  exch def
+   /U-height U-top U-bot sub def
+   /U-width  U-right U-left sub def
+   TeX-MBB aload pop % get TeX MBB
+   /T-top   exch def
+   /T-right exch def
+   /T-bot   exch def
+   /T-left  exch def
+   /T-height T-top T-bot sub def
+   /T-width  T-right T-left sub def
+   % Compute scaling in X and Y
+   /S-x T-width  U-width  div def
+   /S-y T-height U-height div def
+   % Compute translation
+   T-left T-bot translate
+   S-x S-y scale
+   % Compute translation
+   U-left neg U-bot neg translate
+} def
+
+%
+% Draw a box around an mbb-array
+%
+% <[mbb]> TeX-mbb-box
+%
+/TeX-mbb-box {
+   aload pop
+   /B-ury exch def
+   /B-urx exch def
+   /B-lly exch def
+   /B-llx exch def
+   newpath B-llx B-lly moveto B-llx B-ury lineto B-urx B-ury
+   lineto B-urx B-lly lineto closepath stroke
+} def
+
+
+{[30 30 581 761]} Not-In-TeX
+{[30 30 761 581]} In-TeX
+/My-MBB exch def
+My-MBB TeX-do-square-scale
+/M {moveto} def /D {lineto} def /S {stroke} def /F {fill} def /G {setgray} def
+/E {matrix currentmatrix 5 1 roll translate scale 0 0 1 0 360 arc setmatrix} def
+/TF {findfont setfont} def /TB {gsave} def
+/TY {currentpoint grestore currentpoint pop exch pop -.8} def
+/TX {3 1 roll exch sub} def /TJ {exch rmoveto} def
+/TNJ {pop 0} def /TCJ {.5 mul} def /TW {stringwidth rmoveto} def
+/TBP {0 .5 rmoveto .75 .75 scale} def /TBB {0 -.2 rmoveto .75 .75 scale} def
+/TFP {1.3333 dup scale 0 -.5 rmoveto} def /TFB {1.3333 dup scale 0 .2 rmoveto} def
+/BOX { 2 copy M 3 index exch D 3 -1 roll 2 index D exch D closepath } def
+7.0 setlinewidth 1 setlinejoin
+1 10 div dup scale newpath
+{90 rotate 0 -7910 translate} In-TeX
+{showpage} Not-In-TeX
+restore
+% End of PLOT-generated PostScript
